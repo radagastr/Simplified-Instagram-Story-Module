@@ -46,6 +46,7 @@ class StoryFragment : BaseFragment() {
             val adapter = StoryViewPagerAdapter(context!!, list)
             adapter.onProfileStoryFinished = { profilePosition ->
                 if ((profilePosition + 1) < list.size) {
+                    adapter.profileStoryPosition = firstPosition
                     storyViewPager.currentItem = profilePosition + 1
                 } else {
                     Toast.makeText(context!!, R.string.str_stories_finished, Toast.LENGTH_LONG).show()
@@ -54,10 +55,10 @@ class StoryFragment : BaseFragment() {
             }
             adapter.onProfileStoryBack = { profilePosition ->
                 if ((profilePosition - 1) >= 0) {
+                    adapter.profileStoryPosition = firstPosition
                     storyViewPager.currentItem = profilePosition - 1
                 }
             }
-            storyViewPager.offscreenPageLimit = 1
             storyViewPager.adapter = adapter
             storyViewPager.setPageTransformer(true, CubeTransformer())
             storyViewPager.addOnPageChangeListener(object : OnPageChangeListener {
@@ -72,6 +73,7 @@ class StoryFragment : BaseFragment() {
                     val imageView = storyViewPager.findViewWithTag<ImageView>("ImageView:$position")
                     val progressBarContainer = storyViewPager.findViewWithTag<LinearLayout>("LinearLayout:$position")
                     adapter.clearAllProgressBars(position, progressBarContainer)
+                    adapter.profileStoryPosition = firstPosition
                     adapter.startTimer(position, imageView, progressBarContainer, firstPosition)
 
                 }
