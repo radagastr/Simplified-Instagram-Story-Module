@@ -88,15 +88,19 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
     }
 
     private fun setCurrentProgressBarToMax(progressBarContainer: LinearLayout) {
-        val pb = progressBarContainer.getChildAt(profileStoryPosition) as ProgressBar
-        pb.progress = 100
-        mCountDownTimer?.cancel()
+        progressBarContainer.getChildAt(profileStoryPosition)?.let {
+            val pb = it as ProgressBar
+            pb.progress = 100
+        }
+        pauseTimer()
     }
 
     private fun setCurrentProgressBarToMin(progressBarContainer: LinearLayout) {
-        val pb = progressBarContainer.getChildAt(profileStoryPosition) as ProgressBar
-        pb.progress = 0
-        mCountDownTimer?.cancel()
+        progressBarContainer.getChildAt(profileStoryPosition)?.let {
+            val pb = it as ProgressBar
+            pb.progress = 0
+        }
+        pauseTimer()
     }
 
     private fun setForwardButtonListener(
@@ -115,12 +119,12 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
                 MotionEvent.ACTION_DOWN -> {
                     pressTime = System.currentTimeMillis()
                     Log.e("EM", "pause timer")
-                    pauseTimer(progressBarContainer)
+                    pauseTimer()
                     return@OnTouchListener false
                 }
                 MotionEvent.ACTION_UP -> {
                     val now = System.currentTimeMillis()
-                    continueTimer(progressBarContainer)
+                    continueTimer()
                     return@OnTouchListener limit < now - pressTime
                 }
             }
@@ -168,12 +172,12 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
                 MotionEvent.ACTION_DOWN -> {
                     pressTime = System.currentTimeMillis()
                     Log.e("EM", "pause timer")
-                    pauseTimer(progressBarContainer)
+                    pauseTimer()
                     return@OnTouchListener false
                 }
                 MotionEvent.ACTION_UP -> {
                     val now = System.currentTimeMillis()
-                    continueTimer(progressBarContainer)
+                    continueTimer()
                     return@OnTouchListener limit < now - pressTime
                 }
             }
@@ -220,6 +224,10 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
         vp.removeView(v)
     }
 
+    fun startFirstTimer() {
+
+    }
+
     fun startTimer(
         profilePosition: Int,
         imageView: ImageView,
@@ -247,11 +255,11 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
         }
     }
 
-    private fun pauseTimer(progressBarContainer: LinearLayout) {
+    private fun pauseTimer() {
         mCountDownTimer?.cancel()
     }
 
-    private fun continueTimer(progressBarContainer: LinearLayout) {
+    private fun continueTimer() {
         mCountDownTimer?.start()
 
     }

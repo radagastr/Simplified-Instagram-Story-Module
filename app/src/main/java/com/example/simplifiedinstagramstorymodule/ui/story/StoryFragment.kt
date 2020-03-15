@@ -4,7 +4,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ProgressBar
+import android.widget.Toast
+import androidx.viewpager.widget.ViewPager
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.example.simplifiedinstagramstorymodule.R
 import com.example.simplifiedinstagramstorymodule.core.extension.observe
@@ -18,6 +19,8 @@ import kotlinx.android.synthetic.main.story_fragment.*
 class StoryFragment : BaseFragment() {
 
     private lateinit var storyViewModel: StoryViewModel
+
+    private val firstPosition = 0
 
     override fun layoutId() = R.layout.story_fragment
 
@@ -42,6 +45,9 @@ class StoryFragment : BaseFragment() {
             adapter.onProfileStoryFinished = { profilePosition ->
                 if ((profilePosition + 1) < list.size) {
                     storyViewPager.currentItem = profilePosition + 1
+                } else {
+                    Toast.makeText(context!!, R.string.str_stories_finished, Toast.LENGTH_LONG).show()
+                    activity!!.finish()
                 }
             }
             adapter.onProfileStoryBack = { profilePosition ->
@@ -63,14 +69,24 @@ class StoryFragment : BaseFragment() {
                 override fun onPageSelected(position: Int) {
                     val imageView = storyViewPager.findViewWithTag<ImageView>("ImageView:$position")
                     val progressBarContainer = storyViewPager.findViewWithTag<LinearLayout>("LinearLayout:$position")
-                    adapter.startTimer(position, imageView, progressBarContainer, 0)
-                    //adapter.startProgressBarTimer(progressBar)
+                    adapter.startTimer(position, imageView, progressBarContainer, firstPosition)
 
                 }
             })
-            storyViewPager.currentItem = 0
+            startFirstTimer(storyViewPager)
 
         }
+    }
+
+    private fun startFirstTimer(storyViewPager: ViewPager) {
+        val imageView = storyViewPager.findViewWithTag<ImageView>("ImageView:$firstPosition")
+        val progressBarContainer = storyViewPager.findViewWithTag<LinearLayout>("LinearLayout:$firstPosition")
+
+        val adapter = storyViewPager.adapter
+        adapter?.let {
+            (it as StoryViewPagerAdapter).startTimer(firstPosition, imageView, progressBarContainer, firstPosition)
+        }
+
     }
 
 }

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Simplified Instagram Story Module</string>
+
+    <string name="str_stories_finished">Stories Finished</string>
 </resources>
