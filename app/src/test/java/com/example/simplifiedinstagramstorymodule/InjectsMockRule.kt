@@ -1,4 +1,4 @@
-package tr.com.logo.neon
+package com.example.simplifiedinstagramstorymodule
 
 import org.junit.rules.TestRule
 import org.mockito.MockitoAnnotations
