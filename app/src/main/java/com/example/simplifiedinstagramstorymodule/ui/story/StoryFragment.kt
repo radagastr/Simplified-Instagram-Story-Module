@@ -2,6 +2,9 @@ package com.example.simplifiedinstagramstorymodule.ui.story
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.example.simplifiedinstagramstorymodule.R
 import com.example.simplifiedinstagramstorymodule.core.extension.observe
@@ -10,7 +13,6 @@ import com.example.simplifiedinstagramstorymodule.core.platform.BaseFragment
 import com.example.simplifiedinstagramstorymodule.core.repository.cloud.response.StoryResponse
 import com.example.simplifiedinstagramstorymodule.core.utilities.CubeTransformer
 import kotlinx.android.synthetic.main.story_fragment.*
-
 
 
 class StoryFragment : BaseFragment() {
@@ -50,6 +52,25 @@ class StoryFragment : BaseFragment() {
             storyViewPager.offscreenPageLimit = 1
             storyViewPager.adapter = adapter
             storyViewPager.setPageTransformer(true, CubeTransformer())
+            storyViewPager.addOnPageChangeListener(object : OnPageChangeListener {
+                override fun onPageScrollStateChanged(page: Int) {}
+                override fun onPageScrolled(
+                    position: Int,
+                    arg1: Float,
+                    arg2: Int
+                ) {}
+
+                override fun onPageSelected(position: Int) {
+                    val adapter = storyViewPager.adapter as StoryViewPagerAdapter
+                    val progressBar = storyViewPager.findViewWithTag<ProgressBar>("$position-${adapter.profileStoryPosition}")
+                    val imageView = storyViewPager.findViewWithTag<ImageView>("ImageView:$position")
+                    val progressBarContainer = storyViewPager.findViewWithTag<LinearLayout>("LinearLayout:$position")
+                    adapter.startTimer(position, imageView, progressBarContainer)
+                    //adapter.startProgressBarTimer(progressBar)
+
+                }
+            })
+            storyViewPager.currentItem = 0
 
         }
     }

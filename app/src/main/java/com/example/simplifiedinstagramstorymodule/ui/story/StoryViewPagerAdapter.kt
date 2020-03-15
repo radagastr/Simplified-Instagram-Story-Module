@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -59,6 +60,8 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
         setPreviousButtonListener(v, position, imageView, progressBarContainer)
         setForwardButtonListener(v, position, imageView, progressBarContainer)
         setProgressBarView(progressBarContainer, position)
+        imageView.tag = "ImageView:$position"
+        progressBarContainer.tag = "LinearLayout:$position"
 
         setCurrentProgressBarToMin(progressBarContainer)
         loadImage(position, imageView, progressBarContainer)
@@ -68,7 +71,7 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
     }
 
     private fun setProgressBarView(progressBarContainer: LinearLayout, position: Int) {
-        for (i in profileList[position].stories) {
+        profileList[position].stories.forEachIndexed { index, _ ->
             val pb = ProgressBar(
                 context,
                 null,
@@ -82,6 +85,7 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
             param.setMargins(8, 0, 8, 0)
             pb.layoutParams = param
             pb.max = 100
+            pb.tag = "ProgressBar:$position-$index"
             progressBarContainer.addView(pb)
         }
     }
@@ -89,11 +93,13 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
     private fun setCurrentProgressBarToMax(progressBarContainer: LinearLayout) {
         val pb = progressBarContainer.getChildAt(profileStoryPosition) as ProgressBar
         pb.progress = 100
+        mCountDownTimer?.cancel()
     }
 
     private fun setCurrentProgressBarToMin(progressBarContainer: LinearLayout) {
         val pb = progressBarContainer.getChildAt(profileStoryPosition) as ProgressBar
         pb.progress = 0
+        mCountDownTimer?.cancel()
     }
 
     private fun setForwardButtonListener(
@@ -106,8 +112,8 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
         forward.setOnClickListener {
             setForwardImage(profilePosition, imageView, progressBarContainer)
         }
-        /*
-        forward.setOnTouchListener(OnTouchListener { v, event ->
+
+        forward.setOnTouchListener(View.OnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     pressTime = System.currentTimeMillis()
@@ -117,14 +123,14 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
                 }
                 MotionEvent.ACTION_UP -> {
                     val now = System.currentTimeMillis()
-                    resetTimer(progressBarContainer)
+                    continueTimer(progressBarContainer)
                     return@OnTouchListener limit < now - pressTime
                 }
             }
             false
         })
 
-         */
+
     }
 
     private fun setForwardImage(
@@ -142,7 +148,9 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
             setCurrentProgressBarToMax(progressBarContainer)
             profileStoryPosition++
             loadImage(profilePosition, imageView, progressBarContainer)
+            startTimer(profilePosition, imageView, progressBarContainer)
         } else {
+            setCurrentProgressBarToMax(progressBarContainer)
             onProfileStoryFinished(profilePosition)
         }
     }
@@ -157,8 +165,8 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
         previous.setOnClickListener {
             setBackImage(profilePosition, imageView, progressBarContainer)
         }
-        /*
-        previous.setOnTouchListener(OnTouchListener { v, event ->
+
+        previous.setOnTouchListener(View.OnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     pressTime = System.currentTimeMillis()
@@ -168,14 +176,13 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
                 }
                 MotionEvent.ACTION_UP -> {
                     val now = System.currentTimeMillis()
-                    resetTimer(progressBarContainer)
+                    continueTimer(progressBarContainer)
                     return@OnTouchListener limit < now - pressTime
                 }
             }
             false
         })
 
-         */
     }
 
     private fun setBackImage(
@@ -192,7 +199,9 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
             setCurrentProgressBarToMin(progressBarContainer)
             profileStoryPosition--
             loadImage(profilePosition, imageView, progressBarContainer)
+            startTimer(profilePosition, imageView, progressBarContainer)
         } else {
+            setCurrentProgressBarToMin(progressBarContainer)
             onProfileStoryBack(profilePosition)
         }
     }
@@ -222,8 +231,6 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
         progressBarContainer: LinearLayout
     ) {
         val progressBar = progressBarContainer.getChildAt(profileStoryPosition) as ProgressBar
-
-
         var i = 0
         progressBar.max = 100
         progressBar.progress = i
@@ -246,12 +253,11 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
     }
 
     private fun pauseTimer(progressBarContainer: LinearLayout) {
-        mCountDownTimer!!.cancel()
-        mTimerRunning = false
+        mCountDownTimer?.cancel()
     }
 
     private fun continueTimer(progressBarContainer: LinearLayout) {
-        mCountDownTimer!!.start()
+        mCountDownTimer?.start()
 
     }
 
