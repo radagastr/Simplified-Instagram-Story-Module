@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Simplified Instagram Story Module</string>
 
+    <string name="failure_network_connection">No Network Connection.</string>
+    <string name="failure_server_error">Server Error</string>
+
     <string name="str_stories_finished">Stories Finished</string>
 </resources>

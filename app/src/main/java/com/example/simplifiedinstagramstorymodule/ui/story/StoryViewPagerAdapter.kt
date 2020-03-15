@@ -224,8 +224,13 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
         vp.removeView(v)
     }
 
-    fun startFirstTimer() {
-
+    fun clearAllProgressBars(profilePosition: Int,
+                             progressBarContainer: LinearLayout) {
+        for (i in 0 .. profileList[profilePosition].stories.size) {
+            progressBarContainer.getChildAt(i)?.let {
+                (it as ProgressBar).progress = 0
+            }
+        }
     }
 
     fun startTimer(

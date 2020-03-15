@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.example.simplifiedinstagramstorymodule.R
+import com.example.simplifiedinstagramstorymodule.core.exception.Failure
 import com.example.simplifiedinstagramstorymodule.core.extension.observe
 import com.example.simplifiedinstagramstorymodule.core.extension.viewModel
 import com.example.simplifiedinstagramstorymodule.core.platform.BaseFragment
@@ -35,6 +36,7 @@ class StoryFragment : BaseFragment() {
 
         storyViewModel = viewModel(viewModelFactory) {
             observe(storyResponseLiveData, ::onStoryResponseFetched)
+            observe(failure, ::handleFailure)
         }
     }
 
@@ -69,6 +71,7 @@ class StoryFragment : BaseFragment() {
                 override fun onPageSelected(position: Int) {
                     val imageView = storyViewPager.findViewWithTag<ImageView>("ImageView:$position")
                     val progressBarContainer = storyViewPager.findViewWithTag<LinearLayout>("LinearLayout:$position")
+                    adapter.clearAllProgressBars(position, progressBarContainer)
                     adapter.startTimer(position, imageView, progressBarContainer, firstPosition)
 
                 }
@@ -86,7 +89,17 @@ class StoryFragment : BaseFragment() {
         adapter?.let {
             (it as StoryViewPagerAdapter).startTimer(firstPosition, imageView, progressBarContainer, firstPosition)
         }
+    }
 
+    private fun handleFailure(failure: Failure?) {
+        when (failure) {
+            is Failure.NetworkConnection -> {
+                Toast.makeText(context!!, R.string.failure_network_connection, Toast.LENGTH_LONG).show()
+            }
+            is Failure.ServerError -> {
+                Toast.makeText(context!!, R.string.failure_server_error, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
 }
