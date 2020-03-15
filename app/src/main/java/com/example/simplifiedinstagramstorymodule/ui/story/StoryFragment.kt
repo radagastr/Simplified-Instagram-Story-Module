@@ -61,11 +61,9 @@ class StoryFragment : BaseFragment() {
                 ) {}
 
                 override fun onPageSelected(position: Int) {
-                    val adapter = storyViewPager.adapter as StoryViewPagerAdapter
-                    val progressBar = storyViewPager.findViewWithTag<ProgressBar>("$position-${adapter.profileStoryPosition}")
                     val imageView = storyViewPager.findViewWithTag<ImageView>("ImageView:$position")
                     val progressBarContainer = storyViewPager.findViewWithTag<LinearLayout>("LinearLayout:$position")
-                    adapter.startTimer(position, imageView, progressBarContainer)
+                    adapter.startTimer(position, imageView, progressBarContainer, 0)
                     //adapter.startProgressBarTimer(progressBar)
 
                 }

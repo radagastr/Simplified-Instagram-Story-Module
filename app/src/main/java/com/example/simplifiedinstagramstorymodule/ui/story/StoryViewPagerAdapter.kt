@@ -34,10 +34,7 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
     private var pressTime = 0L
     private var limit = 500L
 
-
     private var mCountDownTimer: CountDownTimer? = null
-
-    private var mTimerRunning = false
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
         return view == `object`
@@ -64,7 +61,7 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
         progressBarContainer.tag = "LinearLayout:$position"
 
         setCurrentProgressBarToMin(progressBarContainer)
-        loadImage(position, imageView, progressBarContainer)
+        loadImage(position, imageView)
         val vp = container as ViewPager
         vp.addView(v, 0)
         return v
@@ -147,8 +144,8 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
         if (hasProfileNextStory) {
             setCurrentProgressBarToMax(progressBarContainer)
             profileStoryPosition++
-            loadImage(profilePosition, imageView, progressBarContainer)
-            startTimer(profilePosition, imageView, progressBarContainer)
+            loadImage(profilePosition, imageView)
+            startTimer(profilePosition, imageView, progressBarContainer, profileStoryPosition)
         } else {
             setCurrentProgressBarToMax(progressBarContainer)
             onProfileStoryFinished(profilePosition)
@@ -198,8 +195,8 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
         if (hasProfileBackStory) {
             setCurrentProgressBarToMin(progressBarContainer)
             profileStoryPosition--
-            loadImage(profilePosition, imageView, progressBarContainer)
-            startTimer(profilePosition, imageView, progressBarContainer)
+            loadImage(profilePosition, imageView)
+            startTimer(profilePosition, imageView, progressBarContainer, profileStoryPosition)
         } else {
             setCurrentProgressBarToMin(progressBarContainer)
             onProfileStoryBack(profilePosition)
@@ -208,15 +205,13 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
 
     private fun loadImage(
         profilePosition: Int,
-        imageView: ImageView,
-        progressBarContainer: LinearLayout
+        imageView: ImageView
     ) {
         Log.e(
             "EM",
             "loadImage: profilePosition: $profilePosition - profileStoryPosition: $profileStoryPosition"
         )
         imageView.loadFromUrl(profileList[profilePosition].stories[profileStoryPosition].src)
-        //startTimer(profilePosition, imageView, progressBarContainer)
     }
 
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
@@ -228,28 +223,28 @@ class StoryViewPagerAdapter(private val context: Context, val profileList: List<
     fun startTimer(
         profilePosition: Int,
         imageView: ImageView,
-        progressBarContainer: LinearLayout
+        progressBarContainer: LinearLayout,
+        profileStoryPosition: Int
     ) {
-        val progressBar = progressBarContainer.getChildAt(profileStoryPosition) as ProgressBar
-        var i = 0
-        progressBar.max = 100
-        progressBar.progress = i
-        mCountDownTimer = object : CountDownTimer(5000, 10) {
+        progressBarContainer.getChildAt(profileStoryPosition)?.let {
+            val progressBar = it as ProgressBar
+            var i = 0
+            progressBar.max = 100
+            progressBar.progress = i
+            mCountDownTimer = object : CountDownTimer(5000, 10) {
 
-            override fun onTick(millisUntilFinished: Long) {
-                //setForwardImage(profilePosition, imageView, progressBarContainer)
-                i++
-                progressBar.progress = i * 100 / (5000 / 10)
-            }
+                override fun onTick(millisUntilFinished: Long) {
+                    i++
+                    progressBar.progress = i * 100 / (5000 / 10)
+                }
 
-            override fun onFinish() {
-                setForwardImage(profilePosition, imageView, progressBarContainer)
-                i++
-                progressBar.progress = 100
-            }
-        }.start()
-
-        mTimerRunning = true
+                override fun onFinish() {
+                    setForwardImage(profilePosition, imageView, progressBarContainer)
+                    i++
+                    progressBar.progress = 100
+                }
+            }.start()
+        }
     }
 
     private fun pauseTimer(progressBarContainer: LinearLayout) {
