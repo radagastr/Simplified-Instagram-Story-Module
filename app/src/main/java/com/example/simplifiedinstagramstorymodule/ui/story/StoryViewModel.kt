@@ -20,8 +20,6 @@ class StoryViewModel
         getStoryList()
     }
 
-
-
     private fun getStoryList() {
         storyUseCase(UseCase.None()) {
             it.either(::handleFailureState, ::onStoryListResponse)
@@ -35,8 +33,8 @@ class StoryViewModel
     }
 
     private fun handleFailureState(failure: Failure) {
+        this.failure.value = failure
         Log.e("EM", failure.toString())
-
     }
 
 }

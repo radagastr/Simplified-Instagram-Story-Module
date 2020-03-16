@@ -33,7 +33,6 @@ class StoryFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         storyViewModel = viewModel(viewModelFactory) {
             observe(storyResponseLiveData, ::onStoryResponseFetched)
             observe(failure, ::handleFailure)
